@@ -3,8 +3,20 @@
 #include <map>
 #include <time.h>
 #include <string>
+#include <unistd.h>
+
+#include "messages.h"
+
 using namespace std;
 
+// use system("cls") for Windows, system("clear") for Unix like OS
+#ifdef _WIN32
+const std::string CLEAR_COMMAND = "cls";
+#else
+const std::string CLEAR_COMMAND = "clear";
+#endif
+
+// functions that check input for some specific words
 int checkForBye(string answer);
 int checkForLife(string answer);
 int checkForYes(string answer);
@@ -12,19 +24,50 @@ int checkForDislikedThing(string answer);
 int checkForSubject(string answer);
 int checkForNo(string answer);
 int checkForMath(string answer);
-void talkAboutLife();
-void talkAboutMaths();
 int checkForDifficulty();
 
-int moodState = 10;
+// two main functions
+void talkAboutLife();
+void talkAboutMaths();
+
+// function that formats a message and prints it
+void printMessage(string message, bool isClearScreenNeeded);
+
+// function that clears screen
+void clearScreen();
+
+// functions to print out messages when talking about life
+void talkAboutStudiesIfLikes();
+void talkAboutStudiesIfDislikes();
+void talkAboutJob();
+void talkAboutWantedJob();
+void talkAboutMovies();
+void talkAboutMusic();
+
+// functions to print out messages when talking about maths
+void askDifficulty();
+void printEasyDifficultyMessages();
+void printNormalDifficultyMessages();
+void printHardDifficultyMessages();
+void printFirstProblemMessages();
+void printLastProblemMessages();
+void printContinueProblemMessages(int problemCounter);
+void printByeMessagesAndCheckForBye();
+void printProblem(string problem);
+int checkProblemInput();
+void printCorrectMessage();
+void printIncorrectMessage();
+
 vector<string> introductionPhrases =
     {"Hey!", "Hello!", "Yo!",
      "What's up?", "Hey, how are you doing?",
      "Hi, hope you are doing well!"};
+
 vector<string> farewellPhrases =
     {"Bye!", "Goodbye!", "Hope to see you soon!",
      "Was nice talking to you!", "Farewell!",
      "Bye bye!"};
+
 map<string, int> easyMathProblems = {
     {"2+2=", 4},
     {"9+3=", 12},
@@ -37,6 +80,7 @@ map<string, int> easyMathProblems = {
     {"23-10+1=", 14},
     {"35-19=", 16},
 };
+
 map<string, int> normalMathProblems = {
     {"3*5+2=", 17},
     {"10*10+4=", 104},
@@ -49,6 +93,7 @@ map<string, int> normalMathProblems = {
     {"65-15*3=", 20},
     {"44/2*3", 66},
 };
+
 map<string, int> hardMathProblems = {
     {"100/20*5+(30*2-50/2)=", 60},
     {"68*13=", 884},
@@ -61,26 +106,30 @@ map<string, int> hardMathProblems = {
     {"45^2+3=", 2028},
     {"13*14*15=", 2730},
 };
+
 string name = "";
+int moodState = 10;
 bool isFirstConversation = 1;
 
 int main()
 // My main objective was to make a fun math problem-solving chatbot, that reacts to the user's answers and changes program answers(mood) depending on them
 // Also I added a functionality to have a short conversation about other topics
+
+// V2 Changes:
+// Done some refactoring, improved layout, naming, UI, added functions, improved modularity, separated data from the logic
+// All messages are held as constants in messages.h
+// Made the program foolproof, all errors are handled
 {
     srand((unsigned)time(NULL));
-
     string answer;
     int randomNum = rand() % introductionPhrases.size();
     cout << introductionPhrases[randomNum] + "\n";
     getline(cin, answer);
 
-    cout << "This is a chatbot for a short conversation or to"
-         << " solve some math problems! May I know your name? :)\n";
+    cout << Messages::INTRODUCTION_MESSAGE;
     getline(cin, name);
 
-    cout << "Okay, " + name + ", if you want to end the "
-         << "conversation anytime just say bye :)\n";
+    printMessage(Messages::END_CONVERSATION_MESSAGE, 1);
     getline(cin, answer);
 
     if (checkForBye(answer))
@@ -90,9 +139,7 @@ int main()
         return 0;
     }
 
-    cout << "Do you want to solve some math problems?\n"
-         << "If not, just say that you want to talk about life"
-            " and we can talk about other things :)\n";
+    printMessage(Messages::ASK_MATH_OR_LIFE_MESSAGE, 1);
     getline(cin, answer);
     if (checkForBye(answer))
     {
@@ -118,244 +165,66 @@ void talkAboutLife()
         int randomNum = rand() % 3;
         if (isFirstConversation)
         {
-            cout << "Firstly, I will present myself."
-                 << "I am chatBot v1! Nice to meet you, " << name << "\n";
+            printMessage(Messages::INTRODUCE_LIFE_CHATBOT_MESSAGE, 1);
+            sleep(2);
+            isFirstConversation = 0;
         }
-        isFirstConversation = 0;
         if (randomNum == 0)
         {
-            cout << "May I know are you a student?\n";
+            printMessage(Messages::ASK_STUDENT_MESSAGE, 1);
             getline(cin, answer);
             if (checkForYes(answer))
             {
-                cout << "Wow that is so nice! Where do you study?\n";
+                printMessage(Messages::STUDENT_RESPONSE_MESSAGE, 1);
                 getline(cin, answer);
 
-                cout << "Okay, that is a nice place to study in for sure."
-                     << " Do you like your studies so far?\n";
+                printMessage(Messages::STUDY_PLACE_RESPONSE_MESSAGE, 1);
                 getline(cin, answer);
                 if (checkForYes(answer))
                 {
-                    cout << "I am happy to hear that! "
-                         << "What subject did you like the most so far?\n";
-                    getline(cin, answer);
-
-                    int subj = checkForSubject(answer);
-                    if (subj == 0)
-                    {
-                        cout << "I have not heard of this subject,"
-                             << " but I hope that next semester will be better!\n";
-                    }
-                    else if (subj == 1)
-                    {
-                        cout << "I love maths too! Glad you liked it!\n";
-                    }
-                    else if (subj == 2)
-                    {
-                        cout << "I guess IT was an introductory subject for you,"
-                             << " glad you liked it!\n";
-                    }
-                    else if (subj == 3)
-                    {
-                        cout << "Biology is fun, but it takes much time to learn everything!"
-                             << " Glad you liked it!\n";
-                    }
-                    else if (subj == 4)
-                    {
-                        cout << "I love economics too! Glad you liked it!\n";
-                    }
-                    else if (subj == 5)
-                    {
-                        cout << "Wow, operating systems is an advanced subject."
-                             << " Glad you liked it!\n";
-                    }
-                    else if (subj == 6)
-                    {
-                        cout << "Data structures are awesome!\n";
-                    }
+                    talkAboutStudiesIfLikes();
                 }
                 else
                 {
-                    cout << "Hmm, I am not happy to hear that. "
-                         << "What do you dislike the most?\n";
-                    getline(cin, answer);
-                    int disl = checkForDislikedThing(answer);
-
-                    if (disl == 0)
-                    {
-                        cout << "I am sad to hear it, "
-                             << " let's hope the next semester will be better :)\n";
-                    }
-                    else if (disl == 1)
-                    {
-                        cout << "I understand that the lecturers might be strict,"
-                             << " but that is they way you learn sometimes! Be strong:)\n";
-                    }
-                    else if (disl == 2)
-                    {
-                        cout << "Timetables can be really bad,"
-                             << " but I suggest organizing your time more efficiently!\n";
-                    }
-                    else if (disl == 3)
-                    {
-                        cout << "Nothing is easy in this life,"
-                             << " you need to go through hard times to become stronger!\n";
-                    }
-                    else if (disl == 4)
-                    {
-                        cout << "Grading systems are different depending on the lecturer,"
-                             << " so I understand that it is sometimes hard to understand them correctly..\n";
-                    }
+                    talkAboutStudiesIfDislikes();
                 }
-
-                cout << "Okay, anyways, how many years "
-                     << "till your studies are finished, " << name << " ?\n";
-                getline(cin, answer);
-                cout << "That may seem like a long way to go,"
-                     << " but time flies fast, so use it productively!\n";
             }
             else
             {
-                cout << "Oh, why have you chose not to study?\n";
+                printMessage(Messages::WHY_NOT_STUDENT_MESSAGE, 1);
                 getline(cin, answer);
-                cout << "In my opinion studies are really important!"
-                     << " Do not forget that you can become a student anyways!\n";
+                printMessage(Messages::STUDIES_IMPORTANT_MESAGE, 1);
             }
         }
         else if (randomNum == 1)
         {
-            cout << "May I know do you have a job?\n";
+            printMessage(Messages::ASK_JOB_MESSAGE, 1);
 
             getline(cin, answer);
             if (checkForYes(answer))
             {
-                cout << "Perfect. If it is not a secret may I"
-                     << " know what do you do for work? ( Input a number 1-3 )"
-                     << "  \n1.IT sphere\n2.Service sphere\n3.Manual labour\n";
-                string input;
-                int intAnswer;
-                while (1)
-                {
-                    getline(cin, input);
-
-                    try
-                    {
-                        intAnswer = stoi(input);
-                    }
-                    catch (exception &err)
-                    {
-                        cout << "Please input a number between 1 and 3.";
-                        moodState--;
-                        continue;
-                    }
-
-                    if (intAnswer > 3 || intAnswer < 1)
-                    {
-                        cout << "Please input a number between 1 and 3.";
-                        continue;
-                    }
-
-                    break;
-                }
-                if (intAnswer == 1)
-                {
-                    cout << "It is nice to hear that you work in an IT sphere already!\n";
-                }
-                else if (intAnswer == 2)
-                {
-                    cout << "Service sphere is a good way to start your career!\n";
-                }
-                else if (intAnswer == 3)
-                {
-                    cout << "Wow, you do not shy from dirty work, I respect that!\n";
-                }
+                talkAboutJob();
             }
             else
             {
-                cout << "Okay, I understand you. What job would you"
-                     << "like to have in the future then? ( Input a number 1-3 )"
-                     << " \n1.IT sphere\n2.Service sphere\n3.Manual labour\n";
-                string input;
-                int intAnswer;
-                while (1)
-                {
-                    getline(cin, input);
-                    try
-                    {
-                        intAnswer = stoi(input);
-                    }
-                    catch (exception &err)
-                    {
-                        cout << "Please input a number.";
-                        moodState--;
-                        continue;
-                    }
-
-                    if (intAnswer > 3 || intAnswer < 1)
-                    {
-                        cout << "Please input a number between 1 and 3.";
-                        continue;
-                    }
-                    break;
-                }
-                if (intAnswer == 1)
-                {
-                    cout << "It is nice to hear that you aspire to work in IT sphere!\n";
-                }
-                else if (intAnswer == 2)
-                {
-                    cout << "Service sphere is a good way to start your career! Good luck!\n";
-                }
-                else if (intAnswer == 3)
-                {
-                    cout << "Wow, you do not shy from dirty work, I respect that!\n";
-                }
+                talkAboutWantedJob();
             }
         }
         else if (randomNum == 2)
         {
-            cout << "Do you like music?\n";
+            printMessage(Messages::ASK_MUSIC_MESSAGE, 1);
             getline(cin, answer);
             if (checkForYes(answer))
             {
-                cout << "I love music as well!"
-                     << " My favourite group is The Beatles, what's yours?\n";
-                getline(cin, answer);
-
-                cout << answer << " is a really nice group,"
-                     << " I will surely listen to some of their songs after!\n";
-
-                cout << "And what is your favourite movie?\n";
-                getline(cin, answer);
-
-                cout << answer << " is a really nice movie,"
-                     << " I have watched it multiple times!\n";
+                talkAboutMusic();
             }
             else
             {
-                cout << "Wow you do not like music?"
-                     << "Interesting... Do you like movies then ?\n";
-                getline(cin, answer);
-                if (checkForYes(answer))
-                {
-                    cout << "Okay, at least you like movies!\n"
-                         << " What is your favourite movie?\n";
-                    getline(cin, answer);
-
-                    cout << answer << " is a really nice movie,"
-                         << " I have watched it multiple times!\n";
-                }
-                else
-                {
-                    cout << "You must be lying, "
-                         << "how can one dislike music and movies.. Strange.\n";
-                }
+                talkAboutMovies();
             }
         }
 
-        cout << "It was nice talking to you, " << name << "!\nShall we continue our conversation?"
-             << " If you do not want to, just say that "
-             << "you want to solve some math problems to take on a challenge!\n";
+        cout << Messages::CONTINUE_OR_MATH_MESSAGE;
         getline(cin, answer);
         if (checkForMath(answer))
         {
@@ -367,58 +236,28 @@ void talkAboutLife()
 
 void talkAboutMaths()
 {
+    if (isFirstConversation)
+    {
+        printMessage(Messages::INTRODUCE_MATH_CHATBOT_MESSAGE, 1);
+        sleep(2);
+        isFirstConversation = 0;
+    }
+
     int solveCounter = 0;
     while (1)
     {
         string answer;
         if (solveCounter == 0)
         {
-            cout << "Okay, perfect. "
-                 << "Now tell me do you want to solve easy,"
-                 << " normal or hard math problems or say"
-                 << " that you want to talk about life to switch the topic :)\n";
+            printMessage(Messages::ASK_MATH_DIFFICULTY_FIRST_MESSAGE, 1);
         }
         else if (solveCounter > 10)
         {
-            cout << "Aren't you getting tired already?"
-                 << " You have done so many. You know,"
-                 << " I need some rest as well:( But yeah"
-                 << " you know the drill, just input a"
-                 << " difficulty if you'd like to proceed...\n";
-            cout << "If not just say that you want to talk about"
-                 << " life and we can talk about other things.\n";
+            printMessage(Messages::ASK_MATH_DIFFICULTY_REST_MESSAGE, 1);
         }
-
         else
         {
-            if (moodState < 5)
-            {
-                cout << "Yeah yeah, good job."
-                     << " Wanna solve some more? If yes, just tell"
-                     << " me the difficulty or just say bye\n";
-                cout << "If not just say  that you"
-                     << " want to talk about life and we can talk"
-                     << " about other things.\n";
-            }
-            else if (moodState >= 5 && moodState < 15)
-            {
-                cout << "Great job. You ready to do some more?"
-                     << " If yes, tell me do you want to solve easy, "
-                     << " normal or hard math problems?\n";
-                cout << "If not just say that you"
-                     << " want to talk about life and we can"
-                     << " talk about other things.\n";
-            }
-            else
-            {
-                cout << "Wow you have done it, " << name << "!!!"
-                     << " Do you want to solve more problems?"
-                     << " If yes, tell me do you want to solve"
-                     << "easy, normal or hard math problems?\n";
-                cout << "If not just say"
-                     << " that you want to talk about life and"
-                     << " we can talk about other things.\n";
-            }
+            askDifficulty();
         }
         int diff = checkForDifficulty();
         map<string, int> chosenProblems;
@@ -429,61 +268,19 @@ void talkAboutMaths()
             break;
         }
 
-        if (diff == 1)
+        if (diff == 1) // easy difficulty was chosen
         {
+            printEasyDifficultyMessages();
             chosenProblems = easyMathProblems;
-            if (moodState < 5)
-            {
-                cout << "Easy difficulty? "
-                     << "It might be too hard for you, " << name << "\n";
-            }
-            else if (moodState >= 5 && moodState < 15)
-            {
-                cout << "So you chose easy difficulty, " << name
-                     << ", Let's practice!\n";
-            }
-            else
-            {
-                cout << "Nice! Easy difficulty is perfect " << name
-                     << ", Let's goo!\n";
-            }
         }
-        else if (diff == 2)
+        else if (diff == 2) // normal difficulty was chosen
         {
-            if (moodState < 5)
-            {
-                cout << "Trust me, better choose easy difficulty"
-                     << "\n";
-            }
-            else if (moodState >= 5 && moodState < 15)
-            {
-                cout << "So you chose normal difficulty, " << name
-                     << ". Fair enough.\n";
-            }
-            else
-            {
-                cout << "Normal? Perfect " << name
-                     << ", let's start asap.\n";
-            }
+            printNormalDifficultyMessages();
             chosenProblems = normalMathProblems;
         }
-        else if (diff == 3)
+        else if (diff == 3) // hard difficulty was chosen
         {
-            if (moodState < 5)
-            {
-                cout << "No way you are solving these," << name
-                     << "...\n";
-            }
-            else if (moodState >= 5 && moodState < 15)
-            {
-                cout << "So you chose hard difficulty," << name
-                     << ", Wow !\n";
-            }
-            else
-            {
-                cout << "This won't be easy, but I believe in you,"
-                     << name << ", !\n";
-            }
+            printHardDifficultyMessages();
             chosenProblems = hardMathProblems;
         }
 
@@ -492,182 +289,50 @@ void talkAboutMaths()
         {
             if (problemCounter == 1)
             {
-                if (moodState < 5)
-                {
-                    cout << "First problem, you will need"
-                         << " some luck if you want to solve it " << problemCounter << "\n";
-                }
-                else if (moodState >= 5 && moodState < 15)
-                {
-                    cout << "Let's start with a problem number 1 "
-                         << "\n";
-                }
-                else
-                {
-                    cout << "Starting with problem number 1, good luck!!!"
-                         << "\n";
-                }
+                printFirstProblemMessages();
             }
             else
             {
                 if (problemCounter == 5)
                 {
                     solveCounter++;
-                    if (moodState < 5)
-                    {
-                        cout << "Can't even fathom how"
-                             << " you have gone this far, but yeah, good job I guess? Last problem.\n";
-                    }
-                    else if (moodState >= 5 && moodState < 15)
-                    {
-                        cout << "Last problem and you will"
-                             << " be done with this difficulty!\n";
-                    }
-                    else
-                    {
-                        cout << "Wow, you are so smart!!!"
-                             << "I have always believed in you, " << name
-                             << ", last problem and you will"
-                             << " be done with this difficulty!\n";
-                    }
+                    printLastProblemMessages();
                 }
                 else
                 {
-                    if (moodState < 5)
-                    {
-                        cout << "You are not really doing good,"
-                             << " but anyways. Let's continue with problem"
-                             << " number " << problemCounter << "\n";
-                    }
-                    else if (moodState >= 5 && moodState < 15)
-                    {
-                        cout << "Okay, " << name << ", let's"
-                             << " continue with problem number " << problemCounter << ".\n";
-                    }
-                    else
-                    {
-                        cout << "You are doing great!!!"
-                             << " Let's move on to problem number " << problemCounter << "\n";
-                    }
+                    printContinueProblemMessages(problemCounter);
                 }
             }
 
             if (problemCounter == 1)
             {
-                if (moodState < 5)
-                {
-                    cout << "A tip : Enter the word bye"
-                         << " and see what happens\n";
-                }
-                else if (moodState >= 5 && moodState < 15)
-                {
-                    cout << "If you do not want"
-                         << " to solve anymore just say bye.\n";
-                }
-                else
-                {
-                    cout << "I believe in you, but "
-                         << "if you are tired just say bye to exit :))\n";
-                }
-                string stringAnswer;
-                getline(cin, stringAnswer);
-                if (checkForBye(stringAnswer))
-                {
-                    int randomNum = rand() % farewellPhrases.size();
-                    cout << farewellPhrases[randomNum] + "\n";
-                    exit(0);
-                }
+                printByeMessagesAndCheckForBye();
             }
             int randomNum = rand() % chosenProblems.size();
             int counter = 0;
-            string input;
             int problemAnswer;
             for (auto &t : chosenProblems)
             {
                 if (counter == randomNum)
                 {
                     problemAnswer = t.second;
-                    if (moodState < 5)
-                    {
-                        cout << "A hard one for you. What is "
-                             << t.first << "\n";
-                    }
-                    else if (moodState >= 5 && moodState < 15)
-                    {
-                        cout << "What is " << t.first
-                             << " input a number \n";
-                    }
-                    else
-                    {
-                        cout << "Easy one just for you:) What is "
-                             << t.first << "\n";
-                    }
+                    printProblem(t.first);
                 }
                 counter++;
             }
             while (1)
             {
-                int intAnswer;
-                while (1)
-                {
-                    getline(cin, input);
-
-                    if (checkForBye(input))
-                    {
-                        int randomNum = rand() % farewellPhrases.size();
-                        cout << farewellPhrases[randomNum] + "\n";
-                        exit(0);
-                    }
-                    try
-                    {
-                        intAnswer = stoi(input);
-                    }
-                    catch (exception &err)
-                    {
-                        cout << "You must input a number!"
-                             << " Why are you trying to cause a bug?\n"
-                             << "Now input an answer(number please):";
-                        moodState--;
-                        continue;
-                    }
-                    break;
-                }
-
+                int intAnswer = checkProblemInput();
+                cout << intAnswer;
                 if (intAnswer == problemAnswer)
                 {
-                    if (moodState < 5)
-                    {
-                        cout << "Not correct,"
-                             << " but I will count it as correct"
-                             << " so we can finish this faster. ( Actually correct )\n";
-                    }
-                    else if (moodState >= 5 && moodState < 15)
-                    {
-                        cout << "You are correct, " << name << ".\n";
-                    }
-                    else
-                    {
-                        cout << "You are correct! As always\n";
-                    }
-                    moodState++;
+                    printCorrectMessage();
                     problemCounter++;
                     break;
                 }
                 else
                 {
-                    if (moodState < 5)
-                    {
-                        cout << "Haha! Nope.\n";
-                    }
-                    else if (moodState >= 5 && moodState < 15)
-                    {
-                        cout << "Wrong! Try again please.\n";
-                    }
-                    else
-                    {
-                        cout << "Almost! Another"
-                             << " attempt and you will get it!\n";
-                    }
+                    printIncorrectMessage();
                     moodState--;
                     continue;
                 }
@@ -708,9 +373,7 @@ int checkForYes(string answer)
     {
         x = tolower(x);
     }
-    if (answer.find("yes") != string::npos ||
-        answer.find("yeah") != string::npos ||
-        answer.find("yep") != string::npos)
+    if (answer.find("ye") != string::npos)
     {
         return 1;
     }
@@ -762,15 +425,15 @@ int checkForSubject(string answer)
     {
         return 3;
     }
-    else if (answer.find("econom") != string::npos)
+    else if (answer.find("econ") != string::npos)
     {
         return 4;
     }
-    else if (answer.find("operating sys") != string::npos)
+    else if (answer.find("operat") != string::npos)
     {
         return 5;
     }
-    else if (answer.find("data struc") != string::npos)
+    else if (answer.find("data") != string::npos)
     {
         return 6;
     }
@@ -841,14 +504,449 @@ int checkForDifficulty()
         {
             if (counter > 3)
             {
-                cout << "Can you stop playing with me?"
-                     << " Just name a difficulty please :/\n";
+                printMessage(Messages::NAME_DIFFICULTY_MESSAGE, 1);
                 moodState--;
                 continue;
             }
-            cout << "Please specify a difficulty...\n";
+            printMessage(Messages::SPECIFY_DIFFICULTY_MESSAGE, 1);
             moodState--;
             counter++;
         }
     }
+}
+
+void printMessage(string message, bool isClearScreenNeeded = 0)
+{
+    if (isClearScreenNeeded)
+    {
+        clearScreen();
+    }
+
+    cout << name << ", " << message;
+}
+
+void talkAboutStudiesIfLikes()
+{
+    string answer;
+    printMessage(Messages::STUDY_LIKE_MESSAGE, 1);
+    getline(cin, answer);
+
+    int subj = checkForSubject(answer);
+    if (subj == 0)
+    {
+        printMessage(Messages::UNKNOWN_SUBJECT_MESSAGE, 1);
+    }
+    else if (subj == 1)
+    {
+        printMessage(Messages::MATH_SUBJECT_MESSAGE, 1);
+    }
+    else if (subj == 2)
+    {
+        printMessage(Messages::IT_SUBJECT_MESSAGE, 1);
+    }
+    else if (subj == 3)
+    {
+        printMessage(Messages::BIOLOGY_SUBJECT_MESSAGE, 1);
+    }
+    else if (subj == 4)
+    {
+        printMessage(Messages::ECONOMICS_SUBJECT_MESSAGE, 1);
+    }
+    else if (subj == 5)
+    {
+        printMessage(Messages::OPERATING_SYSTEMS_SUBJECT_MESSAGE, 1);
+    }
+    else if (subj == 6)
+    {
+        printMessage(Messages::DATA_STRUCTURES_SUBJECT_MESSAGE, 1);
+    }
+
+    printMessage(Messages::STUDIES_FINISHED_MESSAGE, 0);
+    getline(cin, answer);
+    printMessage(Messages::STUDIES_FINISH_MESSAGE, 1);
+}
+
+void talkAboutStudiesIfDislikes()
+{
+    string answer;
+    printMessage(Messages::STUDY_DISLIKE_MESSAGE, 1);
+    getline(cin, answer);
+    int disl = checkForDislikedThing(answer);
+
+    if (disl == 0)
+    {
+        printMessage(Messages::DEFAULT_DISLIKE_MESSAGE, 1);
+    }
+    else if (disl == 1)
+    {
+        printMessage(Messages::LECTURERS_DISLIKE_MESSAGE, 1);
+    }
+    else if (disl == 2)
+    {
+        printMessage(Messages::TIMETABLES_DISLIKE_MESSAGE, 1);
+    }
+    else if (disl == 3)
+    {
+        printMessage(Messages::HARD_DISLIKE_MESSAGE, 1);
+    }
+    else if (disl == 4)
+    {
+        printMessage(Messages::GRADING_DISLIKE_MESSAGE, 1);
+    }
+
+    printMessage(Messages::STUDIES_FINISHED_MESSAGE, 0);
+    getline(cin, answer);
+    printMessage(Messages::STUDIES_FINISH_MESSAGE, 1);
+}
+
+void talkAboutJob()
+{
+    string answer;
+    printMessage(Messages::JOB_TYPE_MESSAGE, 1);
+    string input;
+    int intAnswer;
+    while (1)
+    {
+        getline(cin, input);
+
+        try
+        {
+            intAnswer = stoi(input);
+        }
+        catch (exception &err)
+        {
+            printMessage(Messages::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
+            moodState--;
+            continue;
+        }
+
+        if (intAnswer > 3 || intAnswer < 1)
+        {
+            printMessage(Messages::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
+            continue;
+        }
+
+        break;
+    }
+    if (intAnswer == 1)
+    {
+        printMessage(Messages::WORK_IT_SPHERE_MESSAGE, 1);
+    }
+    else if (intAnswer == 2)
+    {
+        printMessage(Messages::WORK_SERVICE_SPHERE_MESSAGE, 1);
+    }
+    else if (intAnswer == 3)
+    {
+        printMessage(Messages::WORK_MANUAL_SPHERE_MESSAGE, 1);
+    }
+}
+
+void talkAboutWantedJob()
+{
+    string answer;
+    printMessage(Messages::ASPIRE_JOB_TYPE_MESSAGE, 1);
+    string input;
+    int intAnswer;
+    while (1)
+    {
+        getline(cin, input);
+        try
+        {
+            intAnswer = stoi(input);
+        }
+        catch (exception &err)
+        {
+            printMessage(Messages::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
+            moodState--;
+            continue;
+        }
+
+        if (intAnswer > 3 || intAnswer < 1)
+        {
+            printMessage(Messages::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
+            continue;
+        }
+        break;
+    }
+    if (intAnswer == 1)
+    {
+        printMessage(Messages::ASPIRE_IT_SPHERE_MESSAGE, 1);
+    }
+    else if (intAnswer == 2)
+    {
+        printMessage(Messages::ASPIRE_SERVICE_SPHERE_MESSAGE, 1);
+    }
+    else if (intAnswer == 3)
+    {
+        printMessage(Messages::ASPIRE_MANUAL_SPHERE_MESSAGE, 1);
+    }
+}
+
+void talkAboutMusic()
+{
+    string answer;
+    printMessage(Messages::MUSIC_RESPONSE_MESSAGE, 1);
+    getline(cin, answer);
+
+    printMessage(Messages::NICE_GROUP_MESSAGE, 1);
+
+    printMessage(Messages::FAVOURITE_MOVIE_MESSAGE, 0);
+    getline(cin, answer);
+
+    printMessage(Messages::NICE_MOVIE_MESSAGE, 1);
+}
+
+void talkAboutMovies()
+{
+    string answer;
+    printMessage(Messages::ASK_MOVIES_MESSAGE, 1);
+    getline(cin, answer);
+    if (checkForYes(answer))
+    {
+        printMessage(Messages::MOVIE_RESPONSE_MESSAGE, 1);
+        getline(cin, answer);
+
+        printMessage(Messages::NICE_MOVIE_MESSAGE, 1);
+    }
+    else
+    {
+        printMessage(Messages::DISLIKE_MOVIES_AND_MUSIC_MESSAGE, 1);
+    }
+}
+
+void askDifficulty()
+{
+    if (moodState < 5)
+    {
+        printMessage(Messages::ASK_MATH_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        printMessage(Messages::ASK_MATH_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
+    }
+    else
+    {
+        printMessage(Messages::ASK_MATH_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
+    }
+}
+
+void printEasyDifficultyMessages()
+{
+    if (moodState < 5)
+    {
+        printMessage(Messages::EASY_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        printMessage(Messages::EASY_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
+    }
+    else
+    {
+        printMessage(Messages::EASY_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
+    }
+}
+
+void printNormalDifficultyMessages()
+{
+    if (moodState < 5)
+    {
+        printMessage(Messages::NORMAL_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        printMessage(Messages::NORMAL_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
+    }
+    else
+    {
+        printMessage(Messages::NORMAL_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
+    }
+}
+void printHardDifficultyMessages()
+{
+    if (moodState < 5)
+    {
+        printMessage(Messages::HARD_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        printMessage(Messages::HARD_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
+    }
+    else
+    {
+        printMessage(Messages::HARD_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
+    }
+}
+
+void printFirstProblemMessages()
+{
+    if (moodState < 5)
+    {
+        cout << Messages::FIRST_PROBLEM_BAD_MOOD_MESSAGE;
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        cout << Messages::FIRST_PROBLEM_NORMAL_MOOD_MESSAGE;
+    }
+    else
+    {
+        cout << Messages::FIRST_PROBLEM_GOOD_MOOD_MESSAGE;
+    }
+}
+void printLastProblemMessages()
+{
+    if (moodState < 5)
+    {
+        cout << Messages::LAST_PROBLEM_BAD_MOOD_MESSAGE;
+        sleep(2);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        cout << Messages::LAST_PROBLEM_NORMAL_MOOD_MESSAGE;
+        sleep(2);
+    }
+    else
+    {
+        cout << Messages::LAST_PROBLEM_GOOD_MOOD_MESSAGE;
+        sleep(2);
+    }
+}
+void printContinueProblemMessages(int problemCounter)
+{
+    if (moodState < 5)
+    {
+        cout << Messages::CONTINUE_PROBLEM_BAD_MOOD_MESSAGE;
+        cout << problemCounter << ".\n";
+        sleep(2);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        cout << Messages::CONTINUE_PROBLEM_NORMAL_MOOD_MESSAGE;
+        cout << problemCounter << ".\n";
+        sleep(2);
+    }
+    else
+    {
+        cout << Messages::CONTINUE_PROBLEM_GOOD_MOOD_MESSAGE;
+        cout << problemCounter << ".\n";
+        sleep(2);
+    }
+}
+
+void printByeMessagesAndCheckForBye()
+{
+    if (moodState < 5)
+    {
+        printMessage(Messages::INPUT_BYE_BAD_MOOD_MESSAGE, 0);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        printMessage(Messages::INPUT_BYE_NORMAL_MOOD_MESSAGE, 0);
+    }
+    else
+    {
+        printMessage(Messages::INPUT_BYE_GOOD_MOOD_MESSAGE, 0);
+    }
+    string stringAnswer;
+    getline(cin, stringAnswer);
+    if (checkForBye(stringAnswer))
+    {
+        int randomNum = rand() % farewellPhrases.size();
+        cout << farewellPhrases[randomNum] + "\n";
+        exit(0);
+    }
+}
+
+void printProblem(string problem)
+{
+
+    if (moodState < 5)
+    {
+        printMessage(Messages::MATH_PROBLEM_BAD_MOOD_MESSAGE, 1);
+        cout << problem << "\n";
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        printMessage(Messages::MATH_PROBLEM_NORMAL_MOOD_MESSAGE, 1);
+        cout << problem << "\n";
+    }
+    else
+    {
+        printMessage(Messages::MATH_PROBLEM_GOOD_MOOD_MESSAGE, 1);
+        cout << problem << "\n";
+    }
+}
+
+int checkProblemInput()
+{
+    string input;
+    int intAnswer;
+    while (1)
+    {
+        int intAnswer;
+        getline(cin, input);
+
+        if (checkForBye(input))
+        {
+            int randomNum = rand() % farewellPhrases.size();
+            cout << farewellPhrases[randomNum] + "\n";
+            exit(0);
+        }
+        try
+        {
+            intAnswer = stoi(input);
+        }
+        catch (exception &err)
+        {
+            printMessage(Messages::BUG_MESSAGE);
+            moodState--;
+            continue;
+        }
+        break;
+    }
+    return stoi(input);
+}
+
+void printCorrectMessage()
+{
+    if (moodState < 5)
+    {
+        printMessage(Messages::CORRECT_BAD_MOOD_MESSAGE, 1);
+        sleep(2);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        printMessage(Messages::CORRECT_NORMAL_MOOD_MESSAGE, 1);
+        sleep(2);
+    }
+    else
+    {
+        printMessage(Messages::CORRECT_GOOD_MOOD_MESSAGE, 1);
+        sleep(2);
+    }
+    moodState++;
+}
+
+void printIncorrectMessage()
+{
+    if (moodState < 5)
+    {
+        cout << endl;
+        printMessage(Messages::INCORRECT_BAD_MOOD_MESSAGE, 0);
+    }
+    else if (moodState >= 5 && moodState < 15)
+    {
+        cout << endl;
+        printMessage(Messages::INCORRECT_NORMAL_MOOD_MESSAGE, 0);
+    }
+    else
+    {
+        cout << endl;
+        printMessage(Messages::INCORRECT_GOOD_MOOD_MESSAGE, 0);
+    }
+}
+
+void clearScreen()
+{
+    system(CLEAR_COMMAND.c_str());
 }
