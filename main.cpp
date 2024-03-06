@@ -31,7 +31,7 @@ void talkAboutLife();
 void talkAboutMaths();
 
 // function that formats a message and prints it
-void printMessage(string message, bool isClearScreenNeeded);
+void printMsg(string message, bool isClearScreenNeeded);
 
 // function that clears screen
 void clearScreen();
@@ -119,6 +119,7 @@ int main()
 // Done some refactoring, improved layout, naming, UI, added functions, improved modularity, separated data from the logic
 // All messages are held as constants in messages.h
 // Made the program foolproof, all errors are handled
+// Started using git for version control
 {
     srand((unsigned)time(NULL));
     string answer;
@@ -126,10 +127,10 @@ int main()
     cout << introductionPhrases[randomNum] + "\n";
     getline(cin, answer);
 
-    cout << Messages::INTRODUCTION_MESSAGE;
+    cout << Msg::INTRODUCTION_MESSAGE;
     getline(cin, name);
 
-    printMessage(Messages::END_CONVERSATION_MESSAGE, 1);
+    printMsg(Msg::END_CONVERSATION_MESSAGE, 1);
     getline(cin, answer);
 
     if (checkForBye(answer))
@@ -139,7 +140,7 @@ int main()
         return 0;
     }
 
-    printMessage(Messages::ASK_MATH_OR_LIFE_MESSAGE, 1);
+    printMsg(Msg::ASK_MATH_OR_LIFE_MESSAGE, 1);
     getline(cin, answer);
     if (checkForBye(answer))
     {
@@ -165,20 +166,20 @@ void talkAboutLife()
         int randomNum = rand() % 3;
         if (isFirstConversation)
         {
-            printMessage(Messages::INTRODUCE_LIFE_CHATBOT_MESSAGE, 1);
+            printMsg(Msg::INTRODUCE_LIFE_CHATBOT_MESSAGE, 1);
             sleep(2);
             isFirstConversation = 0;
         }
         if (randomNum == 0)
         {
-            printMessage(Messages::ASK_STUDENT_MESSAGE, 1);
+            printMsg(Msg::ASK_STUDENT_MESSAGE, 1);
             getline(cin, answer);
             if (checkForYes(answer))
             {
-                printMessage(Messages::STUDENT_RESPONSE_MESSAGE, 1);
+                printMsg(Msg::STUDENT_RESPONSE_MESSAGE, 1);
                 getline(cin, answer);
 
-                printMessage(Messages::STUDY_PLACE_RESPONSE_MESSAGE, 1);
+                printMsg(Msg::STUDY_PLACE_RESPONSE_MESSAGE, 1);
                 getline(cin, answer);
                 if (checkForYes(answer))
                 {
@@ -191,14 +192,14 @@ void talkAboutLife()
             }
             else
             {
-                printMessage(Messages::WHY_NOT_STUDENT_MESSAGE, 1);
+                printMsg(Msg::WHY_NOT_STUDENT_MESSAGE, 1);
                 getline(cin, answer);
-                printMessage(Messages::STUDIES_IMPORTANT_MESAGE, 1);
+                printMsg(Msg::STUDIES_IMPORTANT_MESAGE, 1);
             }
         }
         else if (randomNum == 1)
         {
-            printMessage(Messages::ASK_JOB_MESSAGE, 1);
+            printMsg(Msg::ASK_JOB_MESSAGE, 1);
 
             getline(cin, answer);
             if (checkForYes(answer))
@@ -212,7 +213,7 @@ void talkAboutLife()
         }
         else if (randomNum == 2)
         {
-            printMessage(Messages::ASK_MUSIC_MESSAGE, 1);
+            printMsg(Msg::ASK_MUSIC_MESSAGE, 1);
             getline(cin, answer);
             if (checkForYes(answer))
             {
@@ -224,7 +225,7 @@ void talkAboutLife()
             }
         }
 
-        cout << Messages::CONTINUE_OR_MATH_MESSAGE;
+        cout << Msg::CONTINUE_OR_MATH_MESSAGE;
         getline(cin, answer);
         if (checkForMath(answer))
         {
@@ -238,7 +239,7 @@ void talkAboutMaths()
 {
     if (isFirstConversation)
     {
-        printMessage(Messages::INTRODUCE_MATH_CHATBOT_MESSAGE, 1);
+        printMsg(Msg::INTRODUCE_MATH_CHATBOT_MESSAGE, 1);
         sleep(2);
         isFirstConversation = 0;
     }
@@ -249,11 +250,11 @@ void talkAboutMaths()
         string answer;
         if (solveCounter == 0)
         {
-            printMessage(Messages::ASK_MATH_DIFFICULTY_FIRST_MESSAGE, 1);
+            printMsg(Msg::ASK_MATH_DIFFICULTY_FIRST_MESSAGE, 1);
         }
         else if (solveCounter > 10)
         {
-            printMessage(Messages::ASK_MATH_DIFFICULTY_REST_MESSAGE, 1);
+            printMsg(Msg::ASK_MATH_DIFFICULTY_REST_MESSAGE, 1);
         }
         else
         {
@@ -504,18 +505,18 @@ int checkForDifficulty()
         {
             if (counter > 3)
             {
-                printMessage(Messages::NAME_DIFFICULTY_MESSAGE, 1);
+                printMsg(Msg::NAME_DIFFICULTY_MESSAGE, 1);
                 moodState--;
                 continue;
             }
-            printMessage(Messages::SPECIFY_DIFFICULTY_MESSAGE, 1);
+            printMsg(Msg::SPECIFY_DIFFICULTY_MESSAGE, 1);
             moodState--;
             counter++;
         }
     }
 }
 
-void printMessage(string message, bool isClearScreenNeeded = 0)
+void printMsg(string message, bool isClearScreenNeeded = 0)
 {
     if (isClearScreenNeeded)
     {
@@ -528,81 +529,81 @@ void printMessage(string message, bool isClearScreenNeeded = 0)
 void talkAboutStudiesIfLikes()
 {
     string answer;
-    printMessage(Messages::STUDY_LIKE_MESSAGE, 1);
+    printMsg(Msg::STUDY_LIKE_MESSAGE, 1);
     getline(cin, answer);
 
     int subj = checkForSubject(answer);
     if (subj == 0)
     {
-        printMessage(Messages::UNKNOWN_SUBJECT_MESSAGE, 1);
+        printMsg(Msg::UNKNOWN_SUBJECT_MESSAGE, 1);
     }
     else if (subj == 1)
     {
-        printMessage(Messages::MATH_SUBJECT_MESSAGE, 1);
+        printMsg(Msg::MATH_SUBJECT_MESSAGE, 1);
     }
     else if (subj == 2)
     {
-        printMessage(Messages::IT_SUBJECT_MESSAGE, 1);
+        printMsg(Msg::IT_SUBJECT_MESSAGE, 1);
     }
     else if (subj == 3)
     {
-        printMessage(Messages::BIOLOGY_SUBJECT_MESSAGE, 1);
+        printMsg(Msg::BIOLOGY_SUBJECT_MESSAGE, 1);
     }
     else if (subj == 4)
     {
-        printMessage(Messages::ECONOMICS_SUBJECT_MESSAGE, 1);
+        printMsg(Msg::ECONOMICS_SUBJECT_MESSAGE, 1);
     }
     else if (subj == 5)
     {
-        printMessage(Messages::OPERATING_SYSTEMS_SUBJECT_MESSAGE, 1);
+        printMsg(Msg::OPERATING_SYSTEMS_SUBJECT_MESSAGE, 1);
     }
     else if (subj == 6)
     {
-        printMessage(Messages::DATA_STRUCTURES_SUBJECT_MESSAGE, 1);
+        printMsg(Msg::DATA_STRUCTURES_SUBJECT_MESSAGE, 1);
     }
 
-    printMessage(Messages::STUDIES_FINISHED_MESSAGE, 0);
+    printMsg(Msg::STUDIES_FINISHED_MESSAGE, 0);
     getline(cin, answer);
-    printMessage(Messages::STUDIES_FINISH_MESSAGE, 1);
+    printMsg(Msg::STUDIES_FINISH_MESSAGE, 1);
 }
 
 void talkAboutStudiesIfDislikes()
 {
     string answer;
-    printMessage(Messages::STUDY_DISLIKE_MESSAGE, 1);
+    printMsg(Msg::STUDY_DISLIKE_MESSAGE, 1);
     getline(cin, answer);
     int disl = checkForDislikedThing(answer);
 
     if (disl == 0)
     {
-        printMessage(Messages::DEFAULT_DISLIKE_MESSAGE, 1);
+        printMsg(Msg::DEFAULT_DISLIKE_MESSAGE, 1);
     }
     else if (disl == 1)
     {
-        printMessage(Messages::LECTURERS_DISLIKE_MESSAGE, 1);
+        printMsg(Msg::LECTURERS_DISLIKE_MESSAGE, 1);
     }
     else if (disl == 2)
     {
-        printMessage(Messages::TIMETABLES_DISLIKE_MESSAGE, 1);
+        printMsg(Msg::TIMETABLES_DISLIKE_MESSAGE, 1);
     }
     else if (disl == 3)
     {
-        printMessage(Messages::HARD_DISLIKE_MESSAGE, 1);
+        printMsg(Msg::HARD_DISLIKE_MESSAGE, 1);
     }
     else if (disl == 4)
     {
-        printMessage(Messages::GRADING_DISLIKE_MESSAGE, 1);
+        printMsg(Msg::GRADING_DISLIKE_MESSAGE, 1);
     }
 
-    printMessage(Messages::STUDIES_FINISHED_MESSAGE, 0);
+    printMsg(Msg::STUDIES_FINISHED_MESSAGE, 0);
     getline(cin, answer);
-    printMessage(Messages::STUDIES_FINISH_MESSAGE, 1);
+    printMsg(Msg::STUDIES_FINISH_MESSAGE, 1);
 }
 
 void talkAboutJob()
 {
     string answer;
-    printMessage(Messages::JOB_TYPE_MESSAGE, 1);
+    printMsg(Msg::JOB_TYPE_MESSAGE, 1);
     string input;
     int intAnswer;
     while (1)
@@ -615,14 +616,14 @@ void talkAboutJob()
         }
         catch (exception &err)
         {
-            printMessage(Messages::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
+            printMsg(Msg::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
             moodState--;
             continue;
         }
 
         if (intAnswer > 3 || intAnswer < 1)
         {
-            printMessage(Messages::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
+            printMsg(Msg::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
             continue;
         }
 
@@ -630,22 +631,22 @@ void talkAboutJob()
     }
     if (intAnswer == 1)
     {
-        printMessage(Messages::WORK_IT_SPHERE_MESSAGE, 1);
+        printMsg(Msg::WORK_IT_SPHERE_MESSAGE, 1);
     }
     else if (intAnswer == 2)
     {
-        printMessage(Messages::WORK_SERVICE_SPHERE_MESSAGE, 1);
+        printMsg(Msg::WORK_SERVICE_SPHERE_MESSAGE, 1);
     }
     else if (intAnswer == 3)
     {
-        printMessage(Messages::WORK_MANUAL_SPHERE_MESSAGE, 1);
+        printMsg(Msg::WORK_MANUAL_SPHERE_MESSAGE, 1);
     }
 }
 
 void talkAboutWantedJob()
 {
     string answer;
-    printMessage(Messages::ASPIRE_JOB_TYPE_MESSAGE, 1);
+    printMsg(Msg::ASPIRE_JOB_TYPE_MESSAGE, 1);
     string input;
     int intAnswer;
     while (1)
@@ -657,61 +658,61 @@ void talkAboutWantedJob()
         }
         catch (exception &err)
         {
-            printMessage(Messages::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
+            printMsg(Msg::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
             moodState--;
             continue;
         }
 
         if (intAnswer > 3 || intAnswer < 1)
         {
-            printMessage(Messages::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
+            printMsg(Msg::INPUT_NUMBER_BETWEEN_1_3_MESSAGE, 1);
             continue;
         }
         break;
     }
     if (intAnswer == 1)
     {
-        printMessage(Messages::ASPIRE_IT_SPHERE_MESSAGE, 1);
+        printMsg(Msg::ASPIRE_IT_SPHERE_MESSAGE, 1);
     }
     else if (intAnswer == 2)
     {
-        printMessage(Messages::ASPIRE_SERVICE_SPHERE_MESSAGE, 1);
+        printMsg(Msg::ASPIRE_SERVICE_SPHERE_MESSAGE, 1);
     }
     else if (intAnswer == 3)
     {
-        printMessage(Messages::ASPIRE_MANUAL_SPHERE_MESSAGE, 1);
+        printMsg(Msg::ASPIRE_MANUAL_SPHERE_MESSAGE, 1);
     }
 }
 
 void talkAboutMusic()
 {
     string answer;
-    printMessage(Messages::MUSIC_RESPONSE_MESSAGE, 1);
+    printMsg(Msg::MUSIC_RESPONSE_MESSAGE, 1);
     getline(cin, answer);
 
-    printMessage(Messages::NICE_GROUP_MESSAGE, 1);
+    printMsg(Msg::NICE_GROUP_MESSAGE, 1);
 
-    printMessage(Messages::FAVOURITE_MOVIE_MESSAGE, 0);
+    printMsg(Msg::FAVOURITE_MOVIE_MESSAGE, 0);
     getline(cin, answer);
 
-    printMessage(Messages::NICE_MOVIE_MESSAGE, 1);
+    printMsg(Msg::NICE_MOVIE_MESSAGE, 1);
 }
 
 void talkAboutMovies()
 {
     string answer;
-    printMessage(Messages::ASK_MOVIES_MESSAGE, 1);
+    printMsg(Msg::ASK_MOVIES_MESSAGE, 1);
     getline(cin, answer);
     if (checkForYes(answer))
     {
-        printMessage(Messages::MOVIE_RESPONSE_MESSAGE, 1);
+        printMsg(Msg::MOVIE_RESPONSE_MESSAGE, 1);
         getline(cin, answer);
 
-        printMessage(Messages::NICE_MOVIE_MESSAGE, 1);
+        printMsg(Msg::NICE_MOVIE_MESSAGE, 1);
     }
     else
     {
-        printMessage(Messages::DISLIKE_MOVIES_AND_MUSIC_MESSAGE, 1);
+        printMsg(Msg::DISLIKE_MOVIES_AND_MUSIC_MESSAGE, 1);
     }
 }
 
@@ -719,15 +720,15 @@ void askDifficulty()
 {
     if (moodState < 5)
     {
-        printMessage(Messages::ASK_MATH_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
+        printMsg(Msg::ASK_MATH_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        printMessage(Messages::ASK_MATH_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
+        printMsg(Msg::ASK_MATH_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
     }
     else
     {
-        printMessage(Messages::ASK_MATH_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
+        printMsg(Msg::ASK_MATH_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
     }
 }
 
@@ -735,15 +736,15 @@ void printEasyDifficultyMessages()
 {
     if (moodState < 5)
     {
-        printMessage(Messages::EASY_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
+        printMsg(Msg::EASY_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        printMessage(Messages::EASY_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
+        printMsg(Msg::EASY_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
     }
     else
     {
-        printMessage(Messages::EASY_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
+        printMsg(Msg::EASY_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
     }
 }
 
@@ -751,30 +752,30 @@ void printNormalDifficultyMessages()
 {
     if (moodState < 5)
     {
-        printMessage(Messages::NORMAL_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
+        printMsg(Msg::NORMAL_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        printMessage(Messages::NORMAL_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
+        printMsg(Msg::NORMAL_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
     }
     else
     {
-        printMessage(Messages::NORMAL_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
+        printMsg(Msg::NORMAL_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
     }
 }
 void printHardDifficultyMessages()
 {
     if (moodState < 5)
     {
-        printMessage(Messages::HARD_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
+        printMsg(Msg::HARD_DIFFICULTY_BAD_MOOD_MESSAGE, 1);
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        printMessage(Messages::HARD_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
+        printMsg(Msg::HARD_DIFFICULTY_NORMAL_MOOD_MESSAGE, 1);
     }
     else
     {
-        printMessage(Messages::HARD_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
+        printMsg(Msg::HARD_DIFFICULTY_GOOD_MOOD_MESSAGE, 1);
     }
 }
 
@@ -782,32 +783,32 @@ void printFirstProblemMessages()
 {
     if (moodState < 5)
     {
-        cout << Messages::FIRST_PROBLEM_BAD_MOOD_MESSAGE;
+        cout << Msg::FIRST_PROBLEM_BAD_MOOD_MESSAGE;
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        cout << Messages::FIRST_PROBLEM_NORMAL_MOOD_MESSAGE;
+        cout << Msg::FIRST_PROBLEM_NORMAL_MOOD_MESSAGE;
     }
     else
     {
-        cout << Messages::FIRST_PROBLEM_GOOD_MOOD_MESSAGE;
+        cout << Msg::FIRST_PROBLEM_GOOD_MOOD_MESSAGE;
     }
 }
 void printLastProblemMessages()
 {
     if (moodState < 5)
     {
-        cout << Messages::LAST_PROBLEM_BAD_MOOD_MESSAGE;
+        cout << Msg::LAST_PROBLEM_BAD_MOOD_MESSAGE;
         sleep(2);
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        cout << Messages::LAST_PROBLEM_NORMAL_MOOD_MESSAGE;
+        cout << Msg::LAST_PROBLEM_NORMAL_MOOD_MESSAGE;
         sleep(2);
     }
     else
     {
-        cout << Messages::LAST_PROBLEM_GOOD_MOOD_MESSAGE;
+        cout << Msg::LAST_PROBLEM_GOOD_MOOD_MESSAGE;
         sleep(2);
     }
 }
@@ -815,19 +816,19 @@ void printContinueProblemMessages(int problemCounter)
 {
     if (moodState < 5)
     {
-        cout << Messages::CONTINUE_PROBLEM_BAD_MOOD_MESSAGE;
+        cout << Msg::CONTINUE_PROBLEM_BAD_MOOD_MESSAGE;
         cout << problemCounter << ".\n";
         sleep(2);
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        cout << Messages::CONTINUE_PROBLEM_NORMAL_MOOD_MESSAGE;
+        cout << Msg::CONTINUE_PROBLEM_NORMAL_MOOD_MESSAGE;
         cout << problemCounter << ".\n";
         sleep(2);
     }
     else
     {
-        cout << Messages::CONTINUE_PROBLEM_GOOD_MOOD_MESSAGE;
+        cout << Msg::CONTINUE_PROBLEM_GOOD_MOOD_MESSAGE;
         cout << problemCounter << ".\n";
         sleep(2);
     }
@@ -837,15 +838,15 @@ void printByeMessagesAndCheckForBye()
 {
     if (moodState < 5)
     {
-        printMessage(Messages::INPUT_BYE_BAD_MOOD_MESSAGE, 0);
+        printMsg(Msg::INPUT_BYE_BAD_MOOD_MESSAGE, 0);
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        printMessage(Messages::INPUT_BYE_NORMAL_MOOD_MESSAGE, 0);
+        printMsg(Msg::INPUT_BYE_NORMAL_MOOD_MESSAGE, 0);
     }
     else
     {
-        printMessage(Messages::INPUT_BYE_GOOD_MOOD_MESSAGE, 0);
+        printMsg(Msg::INPUT_BYE_GOOD_MOOD_MESSAGE, 0);
     }
     string stringAnswer;
     getline(cin, stringAnswer);
@@ -862,17 +863,17 @@ void printProblem(string problem)
 
     if (moodState < 5)
     {
-        printMessage(Messages::MATH_PROBLEM_BAD_MOOD_MESSAGE, 1);
+        printMsg(Msg::MATH_PROBLEM_BAD_MOOD_MESSAGE, 1);
         cout << problem << "\n";
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        printMessage(Messages::MATH_PROBLEM_NORMAL_MOOD_MESSAGE, 1);
+        printMsg(Msg::MATH_PROBLEM_NORMAL_MOOD_MESSAGE, 1);
         cout << problem << "\n";
     }
     else
     {
-        printMessage(Messages::MATH_PROBLEM_GOOD_MOOD_MESSAGE, 1);
+        printMsg(Msg::MATH_PROBLEM_GOOD_MOOD_MESSAGE, 1);
         cout << problem << "\n";
     }
 }
@@ -898,7 +899,7 @@ int checkProblemInput()
         }
         catch (exception &err)
         {
-            printMessage(Messages::BUG_MESSAGE);
+            printMsg(Msg::BUG_MESSAGE);
             moodState--;
             continue;
         }
@@ -911,17 +912,17 @@ void printCorrectMessage()
 {
     if (moodState < 5)
     {
-        printMessage(Messages::CORRECT_BAD_MOOD_MESSAGE, 1);
+        printMsg(Msg::CORRECT_BAD_MOOD_MESSAGE, 1);
         sleep(2);
     }
     else if (moodState >= 5 && moodState < 15)
     {
-        printMessage(Messages::CORRECT_NORMAL_MOOD_MESSAGE, 1);
+        printMsg(Msg::CORRECT_NORMAL_MOOD_MESSAGE, 1);
         sleep(2);
     }
     else
     {
-        printMessage(Messages::CORRECT_GOOD_MOOD_MESSAGE, 1);
+        printMsg(Msg::CORRECT_GOOD_MOOD_MESSAGE, 1);
         sleep(2);
     }
     moodState++;
@@ -932,17 +933,17 @@ void printIncorrectMessage()
     if (moodState < 5)
     {
         cout << endl;
-        printMessage(Messages::INCORRECT_BAD_MOOD_MESSAGE, 0);
+        printMsg(Msg::INCORRECT_BAD_MOOD_MESSAGE, 0);
     }
     else if (moodState >= 5 && moodState < 15)
     {
         cout << endl;
-        printMessage(Messages::INCORRECT_NORMAL_MOOD_MESSAGE, 0);
+        printMsg(Msg::INCORRECT_NORMAL_MOOD_MESSAGE, 0);
     }
     else
     {
         cout << endl;
-        printMessage(Messages::INCORRECT_GOOD_MOOD_MESSAGE, 0);
+        printMsg(Msg::INCORRECT_GOOD_MOOD_MESSAGE, 0);
     }
 }
 

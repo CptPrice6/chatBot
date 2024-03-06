@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Messages
+namespace Msg
 {
 
     extern const std::string INTRODUCTION_MESSAGE = "This is a chatbot for a short conversation or to solve some math problems! May I know your name? :)\n";
